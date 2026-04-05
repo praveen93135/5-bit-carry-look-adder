@@ -131,7 +131,6 @@ The design features a fully custom implementation using TSPC flip-flops for inpu
 - **FPGA Synthesis:** Xilinx Vivado (Spartan-7)
 
 ## Repository Structure
-<<<<<<< HEAD
 ```
 5-bit-carry-look-adder/
 ├── NGSPICE/            # Pre-layout and post-layout netlists
@@ -140,14 +139,6 @@ The design features a fully custom implementation using TSPC flip-flops for inpu
 ├── Project_Report.pdf
 └── README.md
 ```
-=======
-5-bit-carry-look-adder/
-├── NGSPICE/          # Pre-layout and post-layout netlists
-├── MAGIC/            # Layout and extraction files
-├── Verilog/          # HDL description and testbenches
-├── Project_Report.pdf
-└── README.md
->>>>>>> 022b689009187fffd286733071e06527dd50c065
 
 ## Author
 **Praveen V**  
