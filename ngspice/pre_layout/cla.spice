@@ -1,0 +1,123 @@
+praveen_2024102019
+.include TSMC_180nm.txt
+.include all_gates.spice
+.param LAMBDA=0.09u
+.param width_P=20*LAMBDA
+.param width_N=10*LAMBDA
+.global gnd vdd
+
+Vdd vdd gnd 1.8
+V_clk clk gnd pulse 1.8 0 0ns 0.1ps 0.1ps 10ns 20ns
+
+Va0 da0 gnd 0
+Va1 da1 gnd 0
+Va2 da2 gnd 0
+Va3 da3 gnd 0
+Va4 da4 gnd 0
+Vb0 db0 gnd 1.8
+Vb1 db1 gnd 1.8
+Vb2 db2 gnd 1.8
+Vb3 db3 gnd 1.8
+Vb4 db4 gnd 1.8
+
+xd1 da0 clk a0 vdd gnd DFF
+xd2 da1 clk a1 vdd gnd DFF
+xd3 da2 clk a2 vdd gnd DFF
+xd4 da3 clk a3 vdd gnd DFF
+xd5 da4 clk a4 vdd gnd DFF
+xd6 db0 clk b0 vdd gnd DFF
+xd7 db1 clk b1 vdd gnd DFF
+xd8 db2 clk b2 vdd gnd DFF
+xd9 db3 clk b3 vdd gnd DFF
+xd10 db4 clk b4 vdd gnd DFF
+
+
+//gi's
+XNAND0 a0 b0 g0_comp vdd gnd NAND
+XNAND1 a1 b1 g1_comp vdd gnd NAND
+XNAND2 a2 b2 g2_comp vdd gnd NAND
+XNAND3 a3 b3 g3_comp vdd gnd NAND
+XNAND4 a4 b4 g4_comp vdd gnd NAND
+
+//pi's 
+xp0 a0 b0  gnd vdd P0_sum XOR
+xp1 a1 b1  gnd vdd P1_sum XOR
+xp2 a2 b2  gnd vdd P2_sum XOR
+xp3 a3 b3  gnd vdd P3_sum XOR
+xp4 a4 b4  gnd vdd P4_sum XOR
+
+//PROPOGATE USING NOR LOGIC (for carry)
+XNOR0  p0_comp a0 b0 gnd vdd NOR
+XNOR1  p1_comp a1 b1 gnd vdd NOR
+XNOR2  p2_comp a2 b2 gnd vdd NOR
+XNOR3  p3_comp a3 b3 gnd vdd NOR
+XNOR4  p4_comp a4 b4 gnd vdd NOR
+
+
+xi1 g0_comp C1 vdd gnd inverter
+
+XC2_OR1   g0_comp  p1_comp   gnd vdd nC2_1 OR      ; nC2_1 = p1_comp + g0_comp
+XNAND5    g1_comp  nC2_1     C2      vdd gnd NAND  ; C2 = ~(g1_comp · nC2_1)
+
+XC3_OR1    p2_comp  g1_comp      gnd vdd nC3_1 OR        ; nC3_1 = p2_comp + g1_comp
+XC3_OR2a   p2_comp  p1_comp      gnd vdd nC3_2a OR       ; nC3_2a = p2_comp + p1_comp
+XC3_OR2    nC3_2a   g0_comp      gnd vdd nC3_2 OR        ; nC3_2  = p2_comp + p1_comp + g0_comp
+XC3_AND1   g2_comp  nC3_1        nC3_mid  vdd gnd AND    ; nC3_mid = g2_comp · (p2_comp + g1_comp)
+XNAND6     nC3_mid  nC3_2        C3       vdd gnd NAND   ; C3 = ~(g2_comp · (...) · (...))
+
+
+XC4_OR1     p3_comp  g2_comp          gnd vdd nC4_1 OR         ; nC4_1 = p3_comp + g2_comp
+XC4_OR2a    p3_comp  p2_comp          gnd vdd nC4_2a OR        ; nC4_2a = p3_comp + p2_comp
+XC4_OR2     nC4_2a   g1_comp          gnd vdd nC4_2 OR         ; nC4_2  = p3_comp + p2_comp + g1_comp
+XC4_OR3a    p3_comp  p2_comp          gnd vdd nC4_3a OR        ; start of (p3+p2+p1+g0)
+XC4_OR3b    nC4_3a   p1_comp          gnd vdd nC4_3b OR
+XC4_OR3     nC4_3b   g0_comp          gnd vdd nC4_3 OR         ; nC4_3  = p3+p2+p1+g0
+XC4_AND1    g3_comp  nC4_1            nC4_mid1 vdd gnd AND     ; g3_comp · (p3+g2)
+XC4_AND2    nC4_mid1 nC4_2            nC4_mid2 vdd gnd AND     ; · (p3+p2+g1)
+XNAND7      nC4_mid2 nC4_3            C4       vdd gnd NAND    ; C4 = ~(product of all 4 factors)
+
+XC5_OR1      p4_comp  g3_comp              gnd vdd nC5_1 OR        ; p4+g3
+XC5_OR2a     p4_comp  p3_comp              gnd vdd nC5_2a OR       ; p4+p3
+XC5_OR2      nC5_2a   g2_comp              gnd vdd nC5_2 OR        ; p4+p3+g2
+XC5_OR3a     p4_comp  p3_comp              gnd vdd nC5_3a OR       ; p4+p3
+XC5_OR3b     nC5_3a   p2_comp              gnd vdd nC5_3b OR       ; p4+p3+p2
+XC5_OR3      nC5_3b   g1_comp              gnd vdd nC5_3 OR        ; p4+p3+p2+g1
+XC5_OR4a     p4_comp  p3_comp              gnd vdd nC5_4a OR       ; p4+p3
+XC5_OR4b     nC5_4a   p2_comp              gnd vdd nC5_4b OR       ; p4+p3+p2
+XC5_OR4c     nC5_4b   p1_comp              gnd vdd nC5_4c OR       ; p4+p3+p2+p1
+XC5_OR4      nC5_4c   g0_comp              gnd vdd nC5_4 OR        ; p4+p3+p2+p1+g0
+
+XC5_AND1     g4_comp  nC5_1                nC5_mid1 vdd gnd AND    ; g4 · (p4+g3)
+XC5_AND2     nC5_mid1 nC5_2                nC5_mid2 vdd gnd AND    ; · (p4+p3+g2)
+XC5_AND3     nC5_mid2 nC5_3                nC5_mid3 vdd gnd AND    ; · (p4+p3+p2+g1)
+XNAND8       nC5_mid3 nC5_4                C5       vdd gnd NAND   ; C5 = ~(whole product)
+
+//sum
+XXOR1 P1_sum C1 gnd vdd S1 XOR
+XXOR2 P2_sum C2 gnd vdd S2 XOR
+XXOR3 P3_sum C3 gnd vdd S3 XOR
+XXOR4 P4_sum C4 gnd vdd S4 XOR
+
+//output flops
+xd11 P0_sum clk S0_out vdd gnd DFF
+xd12 S1 clk S1_out vdd gnd DFF
+xd13 S2 clk S2_out vdd gnd DFF
+xd14 S3 clk S3_out vdd gnd DFF
+xd15 S4 clk S4_out vdd gnd DFF
+xd16 C5 clk C5_out vdd gnd DFF
+
+.tran 100p 140ns
+.MEASURE TRAN tpcd TRIG v(b0) VAL=0.9 RISE=1 TARG v(s4) VAL=0.9 RISE=1
+
+.control
+run
+set color0 = black
+set color1=white
+set linewidth=10
+plot v(s4) v(b0)+2 v(clk)+4
+set curplottitle = 'praveen_2024102019'
+
+* plot v(P0_sum) v(S1)+2 v(S2)+4 v(S3)+6 v(S4)+8 v(C5)+10 v(clk)+12
+plot v(S0_out) v(S1_out)+2 v(S2_out)+4 v(S3_out)+6 v(S4_out)+8 v(C5_out)+10 v(clk)+12
+.endc
+

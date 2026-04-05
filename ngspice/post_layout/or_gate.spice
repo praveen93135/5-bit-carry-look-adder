@@ -1,0 +1,53 @@
+praveen_2024102019
+.include TSMC_180nm.txt
+.param SUPPLY=1.8
+.option scale=0.09u
+.global gnd vdd
+
+VDD   vdd  gnd  {SUPPLY}
+VA A 0 PULSE(0 1.8 0n 1n 1n 10n 20n)
+
+VB B 0 PULSE(0 1.8 0n 1n 1n 20n 40n)
+* SPICE3 file created from or_gate.ext - technology: scmos
+
+.option scale=0.09u
+
+M1000 o1 B a_3_n1# w_n10_n7# CMOSP w=11 l=2
++  ad=66 pd=34 as=77 ps=36
+M1001 GND B o1 Gnd CMOSN w=15 l=2
++  ad=207 pd=108 as=105 ps=44
+M1002 a_3_n1# A VDD w_n10_n7# CMOSP w=11 l=2
++  ad=0 pd=0 as=111 ps=62
+M1003 output o1 GND Gnd CMOSN w=7 l=2
++  ad=42 pd=26 as=0 ps=0
+M1004 o1 A GND Gnd CMOSN w=15 l=2
++  ad=0 pd=0 as=0 ps=0
+M1005 output o1 VDD w_n10_n7# CMOSP w=8 l=2
++  ad=40 pd=26 as=0 ps=0
+C0 A w_n10_n7# 0.06fF
+C1 o1 w_n10_n7# 0.11fF
+C2 o1 output 0.04fF
+C3 output w_n10_n7# 0.04fF
+C4 GND output 0.01fF
+C5 A B 0.07fF
+C6 VDD w_n10_n7# 0.14fF
+C7 o1 B 0.06fF
+C8 B w_n10_n7# 0.06fF
+C9 GND B 0.05fF
+C10 GND Gnd 0.19fF
+C11 output Gnd 0.04fF
+C12 VDD Gnd 0.05fF
+C13 o1 Gnd 0.25fF
+C14 B Gnd 0.26fF
+C15 A Gnd 0.19fF
+C16 w_n10_n7# Gnd 1.35fF
+
+
+
+.tran 1n 160n
+
+
+.control
+    run
+    plot v(a) v(b)+2 v(output)+4
+.endc

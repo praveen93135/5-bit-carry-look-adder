@@ -1,0 +1,46 @@
+praveen_2024102019
+.include TSMC_180nm.txt
+.param SUPPLY=1.8
+.option scale=0.09u
+.global gnd vdd
+
+VDD   vdd  gnd  {SUPPLY}
+VA A 0 PULSE(0 1.8 0n 1n 1n 10n 20n)
+
+VB B 0 PULSE(0 1.8 0n 1n 1n 20n 40n)
+
+VC C 0 PULSE(0 1.8 0n 1n 1n 40n 80n)
+
+
+M1000 a_0_n27# A GND Gnd CMOSN w=6 l=2
++  ad=36 pd=24 as=30 ps=22
+M1001 output B a_0_n27# Gnd CMOSN w=6 l=2
++  ad=30 pd=22 as=0 ps=0
+M1002 VDD B output w_n13_n11# CMOSP w=8 l=2
++  ad=80 pd=52 as=48 ps=28
+M1003 output A VDD w_n13_n11# CMOSP w=8 l=2
++  ad=0 pd=0 as=0 ps=0
+C0 A B 0.09fF
+C1 w_n13_n11# B 0.08fF
+C2 VDD output 0.08fF
+C3 output A 0.05fF
+C4 output w_n13_n11# 0.03fF
+C5 GND A 0.03fF
+C6 VDD w_n13_n11# 0.09fF
+C7 A w_n13_n11# 0.08fF
+C8 output B 0.08fF
+C9 GND Gnd 0.02fF
+C10 output Gnd 0.06fF
+C11 VDD Gnd 0.04fF
+C12 B Gnd 0.22fF
+C13 A Gnd 0.14fF
+C14 w_n13_n11# Gnd 0.74fF
+
+
+.tran 1n 160n
+
+
+.control
+    run
+    plot v(a) v(b)+2 v(output)+4
+.endc

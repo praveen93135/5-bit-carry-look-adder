@@ -1,0 +1,71 @@
+Praveen 2024102019
+.include TSMC_180nm.txt
+.param SUPPLY=1.8
+.option scale=0.09u
+.global gnd vdd
+VDD   vdd  gnd  {SUPPLY}
+
+Vclk   clk   0   PULSE(0 {SUPPLY} 5n 20p 20p 10n 20n)
+
+VD     D     0   PULSE(0 {SUPPLY} 0n 20p 20p 30n 60n)
+
+M1000 y x a_n61_n32# Gnd CMOSN w=12 l=2
++  ad=60 pd=34 as=84 ps=38
+M1001 a_n61_n32# clk GND Gnd CMOSN w=12 l=2
++  ad=0 pd=0 as=463 ps=172
+M1002 VDD y a_n33_n3# w_n95_n11# CMOSP w=12 l=2
++  ad=247 pd=136 as=60 ps=34
+M1003 VDD D a_n89_5# w_n95_n11# CMOSP w=12 l=2
++  ad=0 pd=0 as=156 ps=50
+M1004 a_n89_5# clk x w_n95_n11# CMOSP w=12 l=2
++  ad=0 pd=0 as=72 ps=36
+M1005 output a_n33_n3# VDD w_n95_n11# CMOSP w=11 l=2
++  ad=66 pd=34 as=0 ps=0
+M1006 x D GND Gnd CMOSN w=12 l=2
++  ad=60 pd=34 as=0 ps=0
+M1007 a_n33_n3# clk a_n32_n32# Gnd CMOSN w=12 l=2
++  ad=60 pd=34 as=84 ps=38
+M1008 a_n32_n32# y GND Gnd CMOSN w=12 l=2
++  ad=0 pd=0 as=0 ps=0
+M1009 VDD clk y w_n95_n11# CMOSP w=12 l=2
++  ad=0 pd=0 as=60 ps=34
+M1010 output a_n33_n3# GND Gnd CMOSN w=11 l=2
++  ad=66 pd=34 as=0 ps=0
+C0 w_n95_n11# x 0.04fF
+C1 VDD y 0.04fF
+C2 clk y 0.11fF
+C3 a_n33_n3# VDD 0.04fF
+C4 w_n95_n11# VDD 0.30fF
+C5 w_n95_n11# clk 0.21fF
+C6 x clk 0.09fF
+C7 w_n95_n11# D 0.07fF
+C8 GND clk 0.27fF
+C9 D clk 0.12fF
+C10 w_n95_n11# y 0.15fF
+C11 x y 0.08fF
+C12 output a_n33_n3# 0.04fF
+C13 w_n95_n11# output 0.02fF
+C14 w_n95_n11# a_n33_n3# 0.09fF
+C15 GND Gnd 0.38fF
+C16 output Gnd 0.02fF
+C17 y Gnd 0.18fF
+C18 x Gnd 0.21fF
+C19 a_n33_n3# Gnd 0.18fF
+C20 clk Gnd 0.57fF
+C21 D Gnd 0.32fF
+C22 VDD Gnd 0.08fF
+C23 w_n95_n11# Gnd 2.61fF
+
+* threshold for timing measurements
+.param Vth = {SUPPLY/2}
+
+.measure tran TSETUP TRIG V(clk)   VAL={Vth} FALL=2 TARG V(x) VAL={Vth} RISE=1
+.measure tran TCQ TRIG V(clk)   VAL={Vth} RISE=1 TARG V(output) VAL={Vth} RISE=1
+.measure tran THOLD TRIG V(clk) VAL={Vth} RISE=3 TARG V(y)   VAL={Vth} FALL=1
+
+.tran 1n 200n
+
+.control
+    run
+    plot v(clk) v(D)+2 v(output)+4
+.endc
