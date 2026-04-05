@@ -80,9 +80,3 @@ B.Tech Electronics and Communication Engineering
 International Institute of Information Technology, Hyderabad  
 Email: praveen.v@students.iiit.ac.in
 
-## Author
-**Praveen V**  
-Roll Number: 2024102019  
-B.Tech Electronics and Communication Engineering  
-International Institute of Information Technology, Hyderabad  
-Email: praveen.v@students.iiit.ac.in
